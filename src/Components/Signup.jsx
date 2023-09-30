@@ -7,6 +7,7 @@ function Signup() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [termsChecked, setTermsChecked] = useState(false); // New state for the checkbox
 
   const handleSignUp = (e) => {
     setError("");
@@ -15,6 +16,11 @@ function Signup() {
 
     const email = e.target.email.value;
     const pass = e.target.password.value;
+
+    if (!termsChecked) {
+      setError("Please accept the terms and conditions.");
+      return;
+    }
 
     if (pass.length < 6) {
       setError("Password should be 6 characters or longer");
@@ -81,6 +87,18 @@ function Signup() {
                   onClick={() => setShowPass(!showPass)}
                 />
               )}
+            </div>
+            <div className="mb-4">
+              <input
+                type="checkbox"
+                id="terms"
+                name="terms"
+                checked={termsChecked}
+                onChange={() => setTermsChecked(!termsChecked)}
+              />
+              <label className="ml-2 text-sm text-gray-600" htmlFor="terms">
+                I accept the terms and conditions
+              </label>
             </div>
             <input
               className="w-full py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
