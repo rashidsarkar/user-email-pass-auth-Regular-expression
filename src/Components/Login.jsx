@@ -1,10 +1,15 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import auth from "../firebase/firebase.config";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 function Login() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const emailRef = useRef(null);
   const handleLogIn = (e) => {
     setError("");
     setSuccess("");
@@ -26,11 +31,31 @@ function Login() {
     signInWithEmailAndPassword(auth, email, pass)
       .then((res) => {
         console.log(res);
-        setSuccess("login Done");
+        if (res.user.emailVerified) {
+          setSuccess("login Done with Email Veryfied");
+        } else {
+          setSuccess("login Done with not Email Veryfied");
+        }
       })
       .catch((err) => {
         console.log(err);
         setError(err.message);
+      });
+  };
+  const handleResetPass = () => {
+    const email = emailRef.current.value;
+    if (!email) {
+      console.log("email invalid");
+      return;
+    } else if (/^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/.test(email)) {
+      console.log("please wite a valid email");
+    }
+    console.log("sent reset", emailRef.current.value);
+    // sent valid email
+    sendPasswordResetEmail(auth, email)
+      .then((res) => console.log(res))
+      .then((err) => {
+        console.log(err);
       });
   };
   return (
@@ -52,6 +77,7 @@ function Login() {
                 className="w-full px-3 py-2 border rounded-lg outline-none focus:border-blue-500"
                 type="email"
                 id="email"
+                ref={emailRef}
                 required
               />
             </div>
@@ -69,6 +95,17 @@ function Login() {
                 required
               />
             </div>
+            <p className="my-2 text-lime-800">
+              <Link onClick={handleResetPass} href="#">
+                Forgot Pass
+              </Link>
+            </p>
+            <p className="mb-5">
+              New to This website ? please
+              <Link to="/signup" className="text-amber-800">
+                SingUp
+              </Link>
+            </p>
             <input
               className="w-full py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
               type="submit"
